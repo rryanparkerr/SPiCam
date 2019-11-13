@@ -46,6 +46,7 @@ uint8_t  Bedtime_SleepMinute    = 31;  // Minutes
 tmElements_t tm;
 bool  pi_awake = false;
 bool  firstBoot = true;
+float current = 0.0;
 
 void alarm_isr()
 {
@@ -60,7 +61,7 @@ void setup()
   digitalWrite(LED_PIN,LOW);		// Switch off LED
   // initialize serial communication: In Arduino IDE use "Serial Monitor"
   Serial.begin(9600);
-  Serial.println("Starting...");
+  // Serial.println("Starting...");
   delay(50);
   
   SleepyPi.rtcInit(true);
@@ -73,17 +74,17 @@ void setup()
       SleepyPi.setTime(DateTime(F(__DATE__), F(__TIME__)));
   }  
 
-  printTimeNow();
+  // printTimeNow();
   
-  Serial.print("Alarm Set for: ");
-  Serial.print(WakeUp_StartHour);
-  Serial.print(":");
-  Serial.println(WakeUp_StartMinute);
+  // Serial.print("Alarm Set for: ");
+  // Serial.print(WakeUp_StartHour);
+  // Serial.print(":");
+  // Serial.println(WakeUp_StartMinute);
 
-  Serial.print("Bedtime Set for: ");
-  Serial.print(Bedtime_SleepHour);
-  Serial.print(":");
-  Serial.println(Bedtime_SleepMinute);
+  // Serial.print("Bedtime Set for: ");
+  // Serial.print(Bedtime_SleepHour);
+  // Serial.print(":");
+  // Serial.println(Bedtime_SleepMinute);
   
 }
 
@@ -91,8 +92,17 @@ void loop()
 {
     if(firstBoot == true)
     {
+        //Serial.print("first boot: pi on\t\t");
+        //Serial.println(SleepyPi.readTime().minute());
         SleepyPi.enablePiPower(true);
-        delay(300000);
+        for(int x=0; x<300; x++)
+        {
+          current = SleepyPi.rpiCurrent();
+          Serial.println(current);
+          delay(1000);
+        }
+        //Serial.print("first boot: pi off\t\t");
+        //Serial.println(SleepyPi.readTime().minute());
         SleepyPi.piShutdown();
         firstBoot = false;
     }
@@ -147,89 +157,61 @@ void loop()
         // Example: Read sensor, data logging, data transmission.
         // Just a handler for the pin interrupt.
         digitalWrite(LED_PIN,HIGH);   // Switch on LED
-        Serial.println("I've Just woken up on the Alarm!");
+        // Serial.println("I've Just woken up on the Alarm!");
         // Print the time
-        printTimeNow();   
+        // printTimeNow();   
         delay(50);
         digitalWrite(LED_PIN,LOW);    // Switch off LED
         
         // +++++ uncomment to Power the Rpi ++++++
-        SleepyPi.enablePiPower(true); 
+        SleepyPi.enablePiPower(true);
+        //Serial.print("pi on\t\t");
+        //Serial.println(SleepyPi.readTime().minute());
         pi_awake = true;
-    
-        //if(WakeUp_StartHour < 23)
-        //{
-        //  WakeUp_StartHour = WakeUp_StartHour + 1;
-        //}
-        //else
-        //{
-        //  WakeUp_StartHour = 0;
-        //}
      }
      else
      {
-          // pi awake                
-          SleepyPi.rtcClearInterrupts();
-        
-          // Allow wake up alarm to trigger interrupt on falling edge.
-          attachInterrupt(0, alarm_isr, FALLING);   // Alarm pin
+        // pi awake
+        while(SleepyPi.readTime().minute()<Bedtime_SleepMinute)
+        {
+          current = SleepyPi.rpiCurrent();
+          Serial.println(current);
+          delay(1000);
+        }        
+        //SleepyPi.rtcClearInterrupts();
       
-          SleepyPi.enableWakeupAlarm(true);
-          
-          //DateTime currTime = SleepyPi.readTime();
-          //int hrCurr = currTime.hour();
-          //int mnCurr = currTime.minute();
+        // Allow wake up alarm to trigger interrupt on falling edge.
+        //attachInterrupt(0, alarm_isr, FALLING);   // Alarm pin
+    
+        //SleepyPi.enableWakeupAlarm(true);
         
-          //if(mnCurr < Bedtime_SleepHour)
-          //{
-          //  Bedtime_SleepHour = hrCurr;
-          //}
-          //else
-          //{
-          //  if(hrCurr < 23)
-          //  {
-          //    Bedtime_SleepHour = hrCurr + 1;
-          //  }
-          //  else
-          //  {
-          //    Bedtime_SleepHour = 0;
-          //  }
-          //}
-          
-          // Setup the Alarm Time
-          SleepyPi.setAlarm(Bedtime_SleepHour,Bedtime_SleepMinute);   // Hours & Minutes i.e. 22:07 on the 24 hour clock    
-  
-          delay(500); // Delay purely for serial print
-               
-          // Enter power down state with ADC and BOD module disabled.
-          // Wake up when wake up pin is low (which occurs when our alarm clock goes off)
-          SleepyPi.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
-          
-          // Disable external pin interrupt on wake up pin.
-          detachInterrupt(0); 
-          SleepyPi.ackAlarm();              
-     
-          // Do something here
-          // Just a handler for the pin interrupt.
-          digitalWrite(LED_PIN,HIGH);   // Switch on LED
-          Serial.println("I've Just gone to bed...zzzzzzzz");
-          // Print the time
-          printTimeNow();   
-          delay(50);
-          digitalWrite(LED_PIN,LOW);    // Switch off LED
-        
-        // ++++++ uncomment to Power-down the Rpi ++++++++
-          SleepyPi.piShutdown();         
-          pi_awake = false;
+        // Setup the Alarm Time
+        //SleepyPi.setAlarm(Bedtime_SleepHour,Bedtime_SleepMinute);   // Hours & Minutes i.e. 22:07 on the 24 hour clock    
 
-          //if(Bedtime_SleepHour < 23)
-          //{
-          //  Bedtime_SleepHour = Bedtime_SleepHour + 1;
-          //}
-          //else
-          //{
-          //  Bedtime_SleepHour = 0;
-          //}          
+        //delay(500); // Delay purely for serial print
+             
+        // Enter power down state with ADC and BOD module disabled.
+        // Wake up when wake up pin is low (which occurs when our alarm clock goes off)
+        //SleepyPi.powerDown(SLEEP_FOREVER, ADC_OFF, BOD_OFF); 
+        
+        // Disable external pin interrupt on wake up pin.
+        //detachInterrupt(0); 
+        //SleepyPi.ackAlarm();              
+   
+        // Do something here
+        // Just a handler for the pin interrupt.
+        digitalWrite(LED_PIN,HIGH);   // Switch on LED
+        // Serial.println("I've Just gone to bed...zzzzzzzz");
+        // Print the time
+        // printTimeNow();   
+        delay(50);
+        digitalWrite(LED_PIN,LOW);    // Switch off LED
+      
+        // ++++++ uncomment to Power-down the Rpi ++++++++
+        SleepyPi.piShutdown();
+        //Serial.print("pi off\t\t");
+        //Serial.println(SleepyPi.readTime().minute());        
+        pi_awake = false;       
      }
   
 }

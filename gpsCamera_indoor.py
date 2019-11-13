@@ -1,38 +1,39 @@
 import os
-import gpsd
+# import gpsd
 import time
 import datetime
 import picamera
+# import clockUpdate as cu
 import serial
-import clockUpdate as cu
 
 time.sleep(60)
 
 fldrPath = r"/home/pi/Documents"
-cameraName = "currentTest" #Change this
+cameraName = "currentTester" # Change this
 logPath = os.path.join(fldrPath,cameraName+"_log.txt")
 ser = serial.Serial('/dev/ttyS0', 9600)
 
 if not os.path.exists(logPath):
 	log = open(logPath, "a")
-	log.write("\"Event\" \"Date\" \"Time\" \"Lat./Long.\" \"File Path\" \"Current\"\r\n")
+	log.write("\"Event\" \"Date\" \"Time\" \"Current\" \"File Path\"\r\n")
 	log.close()
 
 print("waiting for serial")
 readSerial = ser.readline()
+print(readSerial)
 log = open(logPath, "a")
-log.write("\"Pi booted (cpu time)\" "+str(datetime.datetime.now())+"\" \"NA\" \"NA\" "+str(readSerial)+"\r\n")
+log.write("\"Pi booted (cpu time)\" "+str(datetime.datetime.now())+"\" "+str(readSerial)+"\r\n")
 log.close()
 
+"""
 t = cu.updateClock()
 
 log = open(logPath, "a")
 log.write("\"Clock updated\" "+str(t)+"\r\n")
 log.close()
 
-
-
 gpsd.connect()
+"""
 cam = picamera.PiCamera()
 cam.resolution = (2700,1800)
 
@@ -53,6 +54,7 @@ for h in range(24):
 	fireTimes.append(window)
 print("All variables initialized")
 
+"""
 while not ready:
 	try:
 		packet = gpsd.get_current()
@@ -66,9 +68,12 @@ while not ready:
 log = open(logPath, "a")
 log.write("\"Signal aquired\" "+str(date)+"\r\n")
 log.close()
+"""
 
 while True:
-	received = False
+	received = True
+	clock = datetime.datetime.now()
+	"""
 	try:
 		packet = gpsd.get_current()
 		pos = packet.position()
@@ -91,16 +96,16 @@ while True:
 				log.close()
 		signal = False
 		print("No signal")
-
+	"""
 	if received == True:
-		print("checking time "+str(gpsTime.time()))
+		print("checking time "+str(clock.time()))
 		for i in range(len(fireTimes)):
-			if fireTimes[i][0] > gpsTime.time() and fireTimes[i][1] < gpsTime.time():
-				imgPath = os.path.join(fldrPath,cameraName+"_"+gpsTime.strftime("%Y%m%d_%H%M")+".jpg")
+			if fireTimes[i][0] > clock.time() and fireTimes[i][1] < clock.time():
+				imgPath = os.path.join(fldrPath,cameraName+"_"+clock.strftime("%Y%m%d_%H%M")+".jpg")
 				print ("Firing camera and saving to "+str(imgPath))
 				cam.capture(imgPath,format='jpeg',quality=100)
 				log = open(logPath, "a")
-				log.write("\"Photo taken\" "+str(gpsTime)+" \""+str(pos)+"\" "+str(imgPath)+"\r\n")
+				log.write("\"Photo taken\" "+str(clock)+" \""+str("Not applicable")+"\" "+str(imgPath)+"\r\n")
 				log.close()
 
 				print("this is when it shuts down")
