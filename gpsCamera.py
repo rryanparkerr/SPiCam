@@ -21,7 +21,7 @@ if not os.path.exists(logPath):
 print("waiting for serial")
 readSerial = ser.readline()
 log = open(logPath, "a")
-log.write("\"Pi booted (cpu time)\" "+str(datetime.datetime.now())+"\" \"NA\" \"NA\" "+str(readSerial)+"\r\n")
+log.write("\"Pi booted (cpu time)\" "+str(datetime.datetime.now())+" \"NA\" \"NA\" "+str(readSerial)+"\r\n")
 log.close()
 
 t = cu.updateClock()
@@ -29,8 +29,6 @@ t = cu.updateClock()
 log = open(logPath, "a")
 log.write("\"Clock updated\" "+str(t)+"\r\n")
 log.close()
-
-
 
 gpsd.connect()
 cam = picamera.PiCamera()
