@@ -89,6 +89,7 @@ void setup()
 
 void loop() 
 {
+  //Responsible for turning on the RPi for the first 5 mins to enable operation [2020]
     if(firstBoot == true)
     {
         SleepyPi.enablePiPower(true);
