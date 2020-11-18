@@ -5,10 +5,10 @@ import datetime
 import picamera
 import clockUpdate as cu
 
-time.sleep(60)
+# time.sleep(60)
 
 fldrPath = r"/home/pi/Documents"
-cameraName = "largo" #Change this
+cameraName = "SPI_CAM" #Change this
 logPath = os.path.join(fldrPath,cameraName+"_log.txt")
 
 if not os.path.exists(logPath):
