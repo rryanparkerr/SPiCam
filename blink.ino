@@ -4,7 +4,7 @@
 #include <PCF8523.h>
 #include <Wire.h>
 
-int let = 13;
+int led = 13;
 
 void setup() {
 	pinmode(led, OUTPUT);
