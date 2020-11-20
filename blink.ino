@@ -7,13 +7,13 @@
 int led = 13;
 
 void setup() {
-	pinmode(led, OUTPUT);
+	pinMode(led, OUTPUT);
 	SleepyPi.enablePiPower(true);
 }
 
 void loop() {
-	digitalWrite(let, HIGH);
+	digitalWrite(led, HIGH);
 	delay(1000);
-	digitalWrite(let, LOW);
+	digitalWrite(led, LOW);
         delay(1000);	
 }
