@@ -15,5 +15,6 @@ for x in range(numberOfPhotos):
     time.sleep(5)
     imgPath = "/home/pi/" + cameraName + "_calibration" + str(x) + ".jpg"
     cam.capture(imgPath, format='jpeg', quality=100)
+    print("image saved")
 
 print('Done')
