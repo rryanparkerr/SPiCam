@@ -1,9 +1,9 @@
 import os
-import gpsd
+#import gpsd
 import time
 import datetime
-import picamera
-import serial
+#import picamera
+#import serial
 import clockUpdate as cu
 
 time.sleep(60)
@@ -11,19 +11,19 @@ time.sleep(60)
 fldrPath = r"/home/pi/Documents"
 cameraName = "currentTest"  # Change this
 logPath = os.path.join(fldrPath, cameraName + "_log.txt")
-ser = serial.Serial('/dev/ttyS0', 9600)
+#ser = serial.Serial('/dev/ttyS0', 9600)
 
 if not os.path.exists(logPath):
     log = open(logPath, "a")
     log.write("\"Event\" \"Date\" \"Time\" \"Lat./Long.\" \"File Path\" \"Current\"\r\n")
     log.close()
-
+"""
 print("waiting for serial")
 readSerial = ser.readline()
 log = open(logPath, "a")
 log.write("\"Pi booted (cpu time)\" " + str(datetime.datetime.now()) + " \"NA\" \"NA\" " + str(readSerial) + "\r\n")
 log.close()
-
+"""
 t = cu.updateClock()
 
 log = open(logPath, "a")
