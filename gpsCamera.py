@@ -10,7 +10,12 @@ import clockUpdate as cu
 fldrPath = r"/home/pi/data"
 if not os.path.exists(fldrPath):
 	os.makedirs(fldrPath)
-cameraName = "SPI_CAM" #Change this
+
+namePath = r"/home/pi/name.txt"
+nameFile = open(namePath, "r")
+cameraName = nameFile.readline()
+nameFile.close()
+
 logPath = os.path.join(fldrPath,cameraName+"_log.txt")
 
 if not os.path.exists(logPath):
